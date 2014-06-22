@@ -131,71 +131,32 @@ p
 ?s
 q
 ---- awaiting results ----
-: The 's' command instructs learntris to execute one step
-: of the simulation.
-:
-: If the matrix contains an unbroken row of blocks, (or
-: in other words, a row that contain no empty cells), then
-: the 's' command should:
-:
-: 1. Clear the row (replacing each block with an empty cell)
-: 2. Increment the 'n' register by 1.
-: 3. Increment the 's' register by 100.
-:
-: This is only an initial approximation of the scoring
-: system, but it will do for now.
----- expected results ----
-0
-. . . . . . . . . .
-. . . . . . . . . .
-. . . . . . . . . .
-. . . . . . . . . .
-. . . . . . . . . .
-. . . . . . . . . .
-. . . . . . . . . .
-. . . . . . . . . .
-. . . . . . . . . .
-. . . . . . . . . .
-. . . . . . . . . .
-. . . . . . . . . .
-. . . . . . . . . .
-m y o . c r g c m y
-. . . . . . . . . .
-. . . . . . . . . .
-. . . . . . . . . .
-. . . . . . . . . .
-. . . . . . . . . .
-. . . . . . . . . .
-. . . . . . . . . .
-. . . . . . . . . .
-1
-100
-Test 7 failed: output mismatch:
-  0
-  . . . . . . . . . .
-  . . . . . . . . . .
-  . . . . . . . . . .
-  . . . . . . . . . .
-  . . . . . . . . . .
-  . . . . . . . . . .
-  . . . . . . . . . .
-  . . . . . . . . . .
-  . . . . . . . . . .
-  . . . . . . . . . .
-- m c r g b y m c o b
-+ . . . . . . . . . .
-  . . . . . . . . . .
-  . . . . . . . . . .
-  m y o . c r g c m y
-  . . . . . . . . . .
-  . . . . . . . . . .
-  . . . . . . . . . .
-  . . . . . . . . . .
-  . . . . . . . . . .
-  . . . . . . . . . .
-  . . . . . . . . . .
-  . . . . . . . . . .
-- 0
-- 0
-+ 1
-+ 100
+Test 7 passed
+
+
+Running test 8: shape.I
+t,I : drawing and selecting the active tetramino
+---- sending commands ----
+I
+t
+q
+---- awaiting results ----
+Test 8 passed
+
+
+Running test 9: shape.O
+O : The O Tetramino
+---- sending commands ----
+O
+t
+q
+---- awaiting results ----
+Test 9 passed
+
+
+Running test 10: shape.Z
+Z : The Z Tetramino
+---- sending commands ----
+Z t q
+---- awaiting results ----
+Test 10 failed: <program timed out>
