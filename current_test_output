@@ -1,0 +1,201 @@
+Running test 1: io.q
+q : quit
+---- sending commands ----
+q
+---- awaiting results ----
+Test 1 passed
+
+
+Running test 2: io.p
+p : print
+---- sending commands ----
+p
+q
+---- awaiting results ----
+Test 2 passed
+
+
+Running test 3: io.g
+g : given
+---- sending commands ----
+g
+. . . . . . . . . .
+. . . . . . . . . .
+. . . . . . . . . .
+. . . . . . . . . .
+m m m m m m m m m m
+b b b b b b b b b b
+c c c c c c c c c c
+g g g g g g g g g g
+y y y y y y y y y y
+o o o o o o o o o o
+r r r r r r r r r r
+. . . . . . . . . .
+. . . . . . . . . .
+. . . . . . . . . .
+. . . . . . . . . .
+c . . . . . . . . .
+c . . . . . . . . .
+c . . . . g . . . .
+c . . o . g g . . .
+. . . o . b g . . .
+. m r r o o b y y .
+m m m r r b b y y .
+p
+q
+---- awaiting results ----
+Test 3 passed
+
+
+Running test 4: io.c
+c : clear
+---- sending commands ----
+g
+. . . . . . . . . .
+. . . . . . . . . .
+. . . . . . . . . .
+. . . . . . . . . .
+m m m m m m m m m m
+b b b b b b b b b b
+c c c c c c c c c c
+g g g g g g g g g g
+y y y y y y y y y y
+o o o o o o o o o o
+r r r r r r r r r r
+. . . . . . . . . .
+. . . . . . . . . .
+. . . . . . . . . .
+. . . . . . . . . .
+c . . . . . . . . .
+c . . . . . . . . .
+c . . . . g . . . .
+c . . o . g g . . .
+. . . o . b g . . .
+. m r r o o b y y .
+m m m r r b b y y .
+c
+p
+q
+---- awaiting results ----
+Test 4 passed
+
+
+Running test 5: io.score.?s
+?s : query 's' register (score)
+---- sending commands ----
+?s
+q
+---- awaiting results ----
+Test 5 passed
+
+
+Running test 6: io.score.?n
+?n : query 'n' register (number of cleared lines)
+---- sending commands ----
+?n
+q
+---- awaiting results ----
+Test 6 passed
+
+
+Running test 7: rule.clear
+s : step
+---- sending commands ----
+?s
+g
+. . . . . . . . . .
+. . . . . . . . . .
+. . . . . . . . . .
+. . . . . . . . . .
+. . . . . . . . . .
+. . . . . . . . . .
+. . . . . . . . . .
+. . . . . . . . . .
+. . . . . . . . . .
+. . . . . . . . . .
+m c r g b y m c o b
+. . . . . . . . . .
+. . . . . . . . . .
+m y o . c r g c m y
+. . . . . . . . . .
+. . . . . . . . . .
+. . . . . . . . . .
+. . . . . . . . . .
+. . . . . . . . . .
+. . . . . . . . . .
+. . . . . . . . . .
+. . . . . . . . . .
+s
+p
+?n
+?s
+q
+---- awaiting results ----
+: The 's' command instructs learntris to execute one step
+: of the simulation.
+:
+: If the matrix contains an unbroken row of blocks, (or
+: in other words, a row that contain no empty cells), then
+: the 's' command should:
+:
+: 1. Clear the row (replacing each block with an empty cell)
+: 2. Increment the 'n' register by 1.
+: 3. Increment the 's' register by 100.
+:
+: This is only an initial approximation of the scoring
+: system, but it will do for now.
+---- expected results ----
+0
+. . . . . . . . . .
+. . . . . . . . . .
+. . . . . . . . . .
+. . . . . . . . . .
+. . . . . . . . . .
+. . . . . . . . . .
+. . . . . . . . . .
+. . . . . . . . . .
+. . . . . . . . . .
+. . . . . . . . . .
+. . . . . . . . . .
+. . . . . . . . . .
+. . . . . . . . . .
+m y o . c r g c m y
+. . . . . . . . . .
+. . . . . . . . . .
+. . . . . . . . . .
+. . . . . . . . . .
+. . . . . . . . . .
+. . . . . . . . . .
+. . . . . . . . . .
+. . . . . . . . . .
+1
+100
+Test 7 failed: output mismatch:
+  0
+  . . . . . . . . . .
+  . . . . . . . . . .
+  . . . . . . . . . .
+  . . . . . . . . . .
+  . . . . . . . . . .
+  . . . . . . . . . .
+  . . . . . . . . . .
+  . . . . . . . . . .
+  . . . . . . . . . .
+  . . . . . . . . . .
+- m c r g b y m c o b
++ . . . . . . . . . .
+  . . . . . . . . . .
+  . . . . . . . . . .
+  m y o . c r g c m y
+  . . . . . . . . . .
+  . . . . . . . . . .
+  . . . . . . . . . .
+  . . . . . . . . . .
+  . . . . . . . . . .
+  . . . . . . . . . .
+  . . . . . . . . . .
+  . . . . . . . . . .
+- 0
+- 0
++ 1
++ 100
