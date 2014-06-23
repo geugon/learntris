@@ -12,20 +12,29 @@ class Tetris(object):
 		self._score = Score()
 		self._piece = None
 
-	def print_score(self): print self._score.score
-	def print_nlines(self): print self._score.nlines
-	
-	def set_board_from_command_line(self): self._board.set_from_command_line()
-	def clear_board(self): self._board.clear()
-	def print_board(self): print self._board
+	def process(self,cmd):
+
+		#Bad input convention causes collision for 'P', so order matters for these two
+		if cmd=='P': pass
+		elif cmd.istitle(): self._piece = Piece(cmd)
+
+		#Other commands
+		elif cmd=='g': self._board.set_from_command_line()
+		elif cmd=='c': self._board.clear()
+		elif cmd=='s': self.step()
+		elif cmd==')': self._piece.rotate_cw()
+		elif cmd=='(': self._piece.rotate_ccw()
+		elif cmd==';': print ''
+		elif cmd=='p': print self._board
+		elif cmd=='t': print self._piece
+		elif cmd=='?s': print self._score.score
+		elif cmd=='?n': print self._score.nlines
 
 	def step(self):
 		(score,nlines) = self._board.step()
 		self._score.score += score
 		self._score.nlines += nlines
 
-	def set_piece(self,style): self._piece = Piece(style)
-	def print_piece(self): print self._piece
 
 
 class Score(object):
@@ -43,12 +52,18 @@ class Piece(TextGraphic):
 	def __init__(self,style):
 		self._data = None
 		if style=='I': self._data = [['.','c','.','.']]*4
-		if style=='O': self._data = [['y','y']]*2
-		if style=='Z': self._data = [['r','.','.'],['r','r','.'],['.','r','.']]
-		if style=='S': self._data = [['.','g','.'],['g','g','.'],['g','.','.']]
-		if style=='J': self._data = [['b','b','.'],['.','b','.'],['.','b','.']]
-		if style=='L': self._data = [['.','o','.'],['.','o','.'],['o','o','.']]
-		if style=='T': self._data = [['.','m','.'],['m','m','.'],['.','m','.']]
+		elif style=='O': self._data = [['y','y']]*2
+		elif style=='Z': self._data = [['r','.','.'],['r','r','.'],['.','r','.']]
+		elif style=='S': self._data = [['.','g','.'],['g','g','.'],['g','.','.']]
+		elif style=='J': self._data = [['b','b','.'],['.','b','.'],['.','b','.']]
+		elif style=='L': self._data = [['.','o','.'],['.','o','.'],['o','o','.']]
+		elif style=='T': self._data = [['.','m','.'],['m','m','.'],['.','m','.']]
+	def rotate_cw(self):
+		self._data = transpose(self._data)
+		self._data.reverse()
+	def rotate_ccw(self):
+		self._data.reverse()
+		self._data = transpose(self._data)
 
 
 class Board(TextGraphic):
@@ -60,7 +75,7 @@ class Board(TextGraphic):
 
 
 	def set_from_command_line(self):
-		self._data = list(transpose( [raw_input().split() for i in xrange(self._rows)] ))
+		self._data = transpose( [raw_input().split() for i in xrange(self._rows)] )
 
 	def clear(self):
 		self._data = self._empty
@@ -89,12 +104,5 @@ def input_generator():
 if __name__ == "__main__":
 	tetris = Tetris()
 	for cmd in input_generator():
-		if cmd.istitle(): tetris.set_piece(cmd) #istitle means uppercase
 		if cmd=='q': break
-		if cmd=='p': tetris.print_board()
-		if cmd=='g': tetris.set_board_from_command_line()
-		if cmd=='c': tetris.clear_board()
-		if cmd=='s': tetris.step()
-		if cmd=='t': tetris.print_piece()
-		if cmd=='?s': tetris.print_score()
-		if cmd=='?n': tetris.print_nlines()
+		tetris.process(cmd)
