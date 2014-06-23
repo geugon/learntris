@@ -35,7 +35,6 @@ class Score(object):
 	
 
 class TextGraphic(object):
-	def __init__(self): pass
 	def __str__(self):
 		return '\n'.join([' '.join(row) for row in transpose(self._data)])
 
@@ -45,6 +44,11 @@ class Piece(TextGraphic):
 		self._data = None
 		if style=='I': self._data = [['.','c','.','.']]*4
 		if style=='O': self._data = [['y','y']]*2
+		if style=='Z': self._data = [['r','.','.'],['r','r','.'],['.','r','.']]
+		if style=='S': self._data = [['.','g','.'],['g','g','.'],['g','.','.']]
+		if style=='J': self._data = [['b','b','.'],['.','b','.'],['.','b','.']]
+		if style=='L': self._data = [['.','o','.'],['.','o','.'],['o','o','.']]
+		if style=='T': self._data = [['.','m','.'],['m','m','.'],['.','m','.']]
 
 
 class Board(TextGraphic):
@@ -76,17 +80,21 @@ class Board(TextGraphic):
 		return score, nlines
 
 
+def input_generator():
+	while True:
+		for cmd in raw_input().split():
+			yield cmd
+
+
 if __name__ == "__main__":
-	cmd = ''
 	tetris = Tetris()
-	while cmd!='q':
-		cmd=raw_input()
+	for cmd in input_generator():
+		if cmd.istitle(): tetris.set_piece(cmd) #istitle means uppercase
+		if cmd=='q': break
 		if cmd=='p': tetris.print_board()
 		if cmd=='g': tetris.set_board_from_command_line()
 		if cmd=='c': tetris.clear_board()
 		if cmd=='s': tetris.step()
-		if cmd=='I': tetris.set_piece('I')
-		if cmd=='O': tetris.set_piece('O')
 		if cmd=='t': tetris.print_piece()
 		if cmd=='?s': tetris.print_score()
 		if cmd=='?n': tetris.print_nlines()
