@@ -1,5 +1,4 @@
-The is my personal implementation of the Learntris Challenge, not intended to be merged back any to the original.  Extraneous branches pruned
-
+This is my personal implementation of the Learntris Challenge, not intended to be merged back to the original.  If you are interested in this excersie, please see the original from LearnProgramming/leantris.  This fork was detached and extraneous branches pruned.
 
 
 The Learntris Challenge
