@@ -1,3 +1,7 @@
+The is my personal implementation of the Learntris Challenge, not intended to be merged back any to the original.  Extraneous branches pruned
+
+
+
 The Learntris Challenge
 =======================
 
