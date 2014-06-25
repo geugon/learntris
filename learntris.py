@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 
+from copy import copy
+from itertools import repeat
+
 def transpose(matrix):
 	return map(list, zip(*matrix))
 
@@ -11,12 +14,15 @@ class Tetris(object):
 		self._board = Board(rows,cols)
 		self._score = Score()
 		self._piece = None
+		self._location = None
 
 	def process(self,cmd):
 
 		#Bad input convention causes collision for 'P', so order matters for these two
-		if cmd=='P': pass
-		elif cmd.istitle(): self._piece = Piece(cmd)
+		if cmd=='P': print self._board
+		elif cmd.istitle():
+			self._piece = Piece(cmd)
+			self._board.place(self._piece)
 
 		#Other commands
 		elif cmd=='g': self._board.set_from_command_line()
@@ -64,21 +70,32 @@ class Piece(TextGraphic):
 	def rotate_ccw(self):
 		self._data.reverse()
 		self._data = transpose(self._data)
+	def nrows(self): return len(self._data[0])
+	def ncols(self): return len(self._data)
 
 
 class Board(TextGraphic):
 	def __init__(self,rows,cols):
 		self._rows = rows
 		self._cols = cols
-		self._empty = [['.']*self._rows]*self._cols
+		self._empty = [	list(repeat('.',self._rows)) for _ in range(self._cols) ]
 		self._data = self._empty
+		self._fixed = self._empty
 
+	def place(self, piece):
+		self._data = copy(self._fixed)
+		for r in range(piece.nrows()):
+			for c in range(piece.ncols()):
+				if piece._data[c][r]!='.':
+					self._data[c+4][r] = copy(piece._data[c][r]).upper()
 
 	def set_from_command_line(self):
-		self._data = transpose( [raw_input().split() for i in xrange(self._rows)] )
+		self._fixed = transpose( [raw_input().split() for i in xrange(self._rows)] )
+		self._data = copy(self._fixed)
 
 	def clear(self):
-		self._data = self._empty
+		self._data = copy(self._empty)
+		self._fixed = copy(self._empty)
 
 	def step(self):
 		new_data = []
