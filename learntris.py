@@ -15,8 +15,17 @@ class Tetris(object):
 		self._score = Score()
 		self._piece = None
 		self._location = None
+		self._mode = "normal"
 
 	def process(self,cmd):
+
+		#Inquire Mode
+		if self._mode != "normal":
+			if cmd=='s': print self._score.score
+			if cmd=='n': print self._score.nlines
+			self._mode = "normal"
+			return
+
 
 		#Bad input convention causes collision for 'P', so order matters for these two
 		if cmd=='P': print self._board
@@ -33,8 +42,14 @@ class Tetris(object):
 		elif cmd==';': print ''
 		elif cmd=='p': print self._board
 		elif cmd=='t': print self._piece
-		elif cmd=='?s': print self._score.score
-		elif cmd=='?n': print self._score.nlines
+		elif cmd=='?': self._mode = "inquire"
+#		elif cmd=='<':
+#			self._piece._c -= 1
+#			self._board.place(self._piece)
+#		elif cmd=='>':
+#			self._piece._c += 1
+#			self._board.place(self._piece)
+
 
 	def step(self):
 		(score,nlines) = self._board.step()
@@ -57,6 +72,9 @@ class TextGraphic(object):
 class Piece(TextGraphic):
 	def __init__(self,style):
 		self._data = None
+		self._c = None
+		self._r = 0
+		self._style = style
 		if style=='I': self._data = [['.','c','.','.']]*4
 		elif style=='O': self._data = [['y','y']]*2
 		elif style=='Z': self._data = [['r','.','.'],['r','r','.'],['.','r','.']]
@@ -64,6 +82,10 @@ class Piece(TextGraphic):
 		elif style=='J': self._data = [['b','b','.'],['.','b','.'],['.','b','.']]
 		elif style=='L': self._data = [['.','o','.'],['.','o','.'],['o','o','.']]
 		elif style=='T': self._data = [['.','m','.'],['m','m','.'],['.','m','.']]
+
+		if style in ['O']: self._c=4
+		if style in ['I','Z','S','L','J','T']: self._c = 3
+
 	def rotate_cw(self):
 		self._data = transpose(self._data)
 		self._data.reverse()
@@ -87,7 +109,7 @@ class Board(TextGraphic):
 		for r in range(piece.nrows()):
 			for c in range(piece.ncols()):
 				if piece._data[c][r]!='.':
-					self._data[c+4][r] = copy(piece._data[c][r]).upper()
+					self._data[c+piece._c][r+piece._r] = copy(piece._data[c][r]).upper()
 
 	def set_from_command_line(self):
 		self._fixed = transpose( [raw_input().split() for i in xrange(self._rows)] )
@@ -114,8 +136,8 @@ class Board(TextGraphic):
 
 def input_generator():
 	while True:
-		for cmd in raw_input().split():
-			yield cmd
+		for cmds in list(raw_input().strip()):
+			for cmd in cmds: yield cmd
 
 
 if __name__ == "__main__":
