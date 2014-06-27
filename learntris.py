@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from copy import copy
+from copy import deepcopy
 from itertools import repeat
 
 def transpose(matrix):
@@ -41,14 +41,18 @@ class Tetris(object):
 		elif cmd=='(': self._piece.rotate_ccw()
 		elif cmd==';': print ''
 		elif cmd=='p': print self._board
+		elif cmd=='d': self._board.debug()
 		elif cmd=='t': print self._piece
 		elif cmd=='?': self._mode = "inquire"
-#		elif cmd=='<':
-#			self._piece._c -= 1
-#			self._board.place(self._piece)
-#		elif cmd=='>':
-#			self._piece._c += 1
-#			self._board.place(self._piece)
+		elif cmd=='<':
+			self._piece._c -= 1
+			self._board.place(self._piece)
+		elif cmd=='>':
+			self._piece._c += 1
+			self._board.place(self._piece)
+		elif cmd=='v':
+			self._piece._r += 1
+			self._board.place(self._piece)
 
 
 	def step(self):
@@ -67,6 +71,10 @@ class Score(object):
 class TextGraphic(object):
 	def __str__(self):
 		return '\n'.join([' '.join(row) for row in transpose(self._data)])
+	def debug(self):
+		print '\n'.join([' '.join(row) for row in transpose(self._empty)])
+		print '\n'.join([' '.join(row) for row in transpose(self._fixed)])
+		print '\n'.join([' '.join(row) for row in transpose(self._data)])
 
 
 class Piece(TextGraphic):
@@ -94,6 +102,7 @@ class Piece(TextGraphic):
 		self._data = transpose(self._data)
 	def nrows(self): return len(self._data[0])
 	def ncols(self): return len(self._data)
+	def attempt_shift(self,direction): pass
 
 
 class Board(TextGraphic):
@@ -101,23 +110,23 @@ class Board(TextGraphic):
 		self._rows = rows
 		self._cols = cols
 		self._empty = [	list(repeat('.',self._rows)) for _ in range(self._cols) ]
-		self._data = self._empty
-		self._fixed = self._empty
+		self._data = deepcopy(self._empty)
+		self._fixed = deepcopy(self._empty)
 
 	def place(self, piece):
-		self._data = copy(self._fixed)
+		self._data = deepcopy(self._fixed)
 		for r in range(piece.nrows()):
 			for c in range(piece.ncols()):
 				if piece._data[c][r]!='.':
-					self._data[c+piece._c][r+piece._r] = copy(piece._data[c][r]).upper()
+					self._data[c+piece._c][r+piece._r] = deepcopy(piece._data[c][r]).upper()
 
 	def set_from_command_line(self):
 		self._fixed = transpose( [raw_input().split() for i in xrange(self._rows)] )
-		self._data = copy(self._fixed)
+		self._data = deepcopy(self._fixed)
 
 	def clear(self):
-		self._data = copy(self._empty)
-		self._fixed = copy(self._empty)
+		self._data = deepcopy(self._empty)
+		self._fixed = deepcopy(self._empty)
 
 	def step(self):
 		new_data = []
