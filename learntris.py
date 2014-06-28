@@ -3,10 +3,6 @@
 from copy import *
 from itertools import repeat
 
-class MoveError(Exception):
-	pass
-
-
 def transpose(matrix):
 	return map(list, zip(*matrix))
 
@@ -35,7 +31,7 @@ class Tetris(object):
 		if cmd=='P': print self._board
 		elif cmd.istitle():
 			self._piece = Piece(cmd)
-			self._board.place(self._piece)
+			self._board.update(self._piece)
 
 		#Other commands
 		elif cmd=='g': self._board.set_from_command_line()
@@ -48,9 +44,18 @@ class Tetris(object):
 		elif cmd=='d': self._board.debug()
 		elif cmd=='t': print self._piece
 		elif cmd=='?': self._mode = "inquire"
-		elif cmd=='<': self._board.shift(cmd)
-		elif cmd=='>': self._board.shift(cmd)
-		elif cmd=='v': self._board.shift(cmd)
+		elif cmd=='<':
+			if self._board.can_shift(cmd):
+				self._piece._coord[0] -= 1
+				self._board.update(self._piece)
+		elif cmd=='>':
+			if self._board.can_shift(cmd):
+				self._piece._coord[0] += 1
+				self._board.update(self._piece)
+		elif cmd=='v':
+			if self._board.can_shift(cmd):
+				self._piece._coord[1] += 1
+				self._board.update(self._piece)
 
 
 	def step(self):
@@ -89,7 +94,7 @@ class Piece(TextGraphic):
 
 		if style in ['O']: col = 4 
 		if style in ['I','Z','S','L','J','T']: col = 3
-		self._startCoord = (col,0)
+		self._coord = [col,0]
 
 	def rotate_cw(self):
 		self._data = transpose(self._data)
@@ -110,40 +115,25 @@ class Board(TextGraphic):
 		self._fixed = deepcopy(self._empty)
 		self._piecePlace = (None,None)
 
-	def place(self, piece):
+	def update(self, piece):
 		self._data = deepcopy(self._fixed)
 		for r in range(piece.nrows()):
 			for c in range(piece.ncols()):
 				if piece._data[c][r]!='.':
-					self._data[c+piece._startCoord[0]][r+piece._startCoord[1]] = deepcopy(piece._data[c][r]).upper()
+					self._data[c+piece._coord[0]][r+piece._coord[1]] = deepcopy(piece._data[c][r]).upper()
 
-	def shift(self, direction):
-		proposal = []
-		try:
-			vectors = deepcopy(self._data)
-			if direction in ['<','>']: vectors = transpose(vectors)
+	def can_shift(self, direction):
+		vectors = deepcopy(self._data)
+		if direction in ['<','>']: vectors = transpose(vectors)
 
-			for vector in vectors:
-				if direction in ['>','v']: vector.reverse()
-				#Leading Edge
-				if vector[0].isupper(): raise MoveError("Offedge Move")
-				#Center Bits
-				for i in range(len(vector)-1):
-					if vector[i] == '.' and vector[i+1].isupper(): vector[i] = copy(vector[i+1])
-					if vector[i].isupper() and not vector[i+1].isupper(): vector[i] = '.' #assumes only one active uppercase at at time
-					if vector[i].islower() and vector[i+1].isupper(): raise MoveError("Collision Move")
-				#Trailing Edge
-				if vector[-1].isupper(): vector[-1]='.'
-
-				if direction in ['>','v']: vector.reverse()
-				proposal.append(vector)
-
-			if direction in ['<','>']: proposal = transpose(proposal)
-			self._data = proposal
-
-		except MoveError:
-			pass
-
+		for vector in vectors:
+			if direction in ['>','v']: vector.reverse()
+			#Edge overrun check
+			if vector[0].isupper(): return False
+			#Collision check
+			for i in range(len(vector)-1):
+				if vector[i].islower() and vector[i+1].isupper(): return False
+		return True
 
 	def set_from_command_line(self):
 		self._fixed = transpose( [raw_input().split() for i in xrange(self._rows)] )
