@@ -3,6 +3,9 @@
 from copy import *
 from itertools import repeat
 
+COPYWRIGHT = "Learntris (c) 1992 Tetraminex, Inc.\nPress start button to begin."
+PAUSESCREEN = "Paused\nPress start button to continue."
+
 def transpose(matrix):
 	return map(list, zip(*matrix))
 
@@ -15,48 +18,67 @@ class Tetris(object):
 		self._score = Score()
 		self._piece = None
 		self._location = None
-		self._mode = "normal"
+		self._mode = "init"
 
 	def process(self,cmd):
 
 		#Inquire Mode
-		if self._mode != "normal":
+		if self._mode == "inquire":
 			if cmd=='s': print self._score.score
 			if cmd=='n': print self._score.nlines
-			self._mode = "normal"
+			self._mode = "game"
 			return
 
+		#Title Mode
+		elif self._mode == "title":
+			if cmd=='p': print COPYWRIGHT
+			if cmd=='!': self._mode = "game"
 
-		#Bad input convention causes collision for 'P', so order matters for these two
-		if cmd=='P': print self._board
-		elif cmd.istitle():
-			self._piece = Piece(cmd)
-			self._board.update(self._piece)
+		#Pause Mode
+		elif self._mode == "pause":
+			if cmd=='p': print PAUSESCREEN
+			if cmd=='!': self._mode = "game"
 
-		#Other commands
-		elif cmd=='g': self._board.set_from_command_line()
-		elif cmd=='c': self._board.clear()
-		elif cmd=='s': self.step()
-		elif cmd==')': self._piece.rotate_cw()
-		elif cmd=='(': self._piece.rotate_ccw()
-		elif cmd==';': print ''
-		elif cmd=='p': print self._board
-		elif cmd=='d': self._board.debug()
-		elif cmd=='t': print self._piece
-		elif cmd=='?': self._mode = "inquire"
-		elif cmd=='<':
-			if self._board.can_shift(cmd):
-				self._piece._coord[0] -= 1
-				self._board.update(self._piece)
-		elif cmd=='>':
-			if self._board.can_shift(cmd):
-				self._piece._coord[0] += 1
-				self._board.update(self._piece)
-		elif cmd=='v':
-			if self._board.can_shift(cmd):
-				self._piece._coord[1] += 1
+		#Game Mode / Init Mode
+		else:
+			#Bad input convention causes collision for uppercase letters, so order matters for these
+			if cmd=='P': print self._board
+			elif cmd=='V':
+				while self._board.can_shift('v'):
+					self._piece._coord[1] += 1
+					self._board.update(self._piece)
+				self._board.settle(self._piece)
+			elif cmd.istitle():
+				self._piece = Piece(cmd)
 				self._board.update(self._piece)
 
+			#Other commands
+			elif cmd=='?': self._mode = "inquire"
+			elif cmd=='@': self._mode = "title"
+			elif cmd=='!':
+				if self._mode != 'init': self._mode = "pause"
+			elif cmd=='g': self._board.set_from_command_line()
+			elif cmd=='c': self._board.clear()
+			elif cmd=='s': self.step()
+			elif cmd==')': self._piece.rotate_cw()
+			elif cmd=='(': self._piece.rotate_ccw()
+			elif cmd==';': print ''
+			elif cmd=='p': print self._board
+			elif cmd=='d': self._board.debug()
+			elif cmd=='t': print self._piece
+			elif cmd=='<':
+				if self._board.can_shift(cmd):
+					self._piece._coord[0] -= 1
+					self._board.update(self._piece)
+			elif cmd=='>':
+				if self._board.can_shift(cmd):
+					self._piece._coord[0] += 1
+					self._board.update(self._piece)
+			elif cmd=='v':
+				if self._board.can_shift(cmd):
+					self._piece._coord[1] += 1
+					self._board.update(self._piece)
+			if self._mode=='init': self._mode='game'
 
 	def step(self):
 		(score,nlines) = self._board.step()
@@ -117,6 +139,7 @@ class Board(TextGraphic):
 
 	def update(self, piece):
 		self._data = deepcopy(self._fixed)
+		if piece is None: return
 		for r in range(piece.nrows()):
 			for c in range(piece.ncols()):
 				if piece._data[c][r]!='.':
@@ -134,6 +157,11 @@ class Board(TextGraphic):
 			for i in range(len(vector)-1):
 				if vector[i].islower() and vector[i+1].isupper(): return False
 		return True
+
+	def settle(self, piece):
+		if not self.can_shift('v'): 
+			self._fixed = [[el.lower() for el in col] for col in self._data]
+			self.update(None)
 
 	def set_from_command_line(self):
 		self._fixed = transpose( [raw_input().split() for i in xrange(self._rows)] )
